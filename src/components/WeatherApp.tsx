@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WeatherData } from '../types/weather';
 import { fetchWeatherData } from '../services/weatherService';
 import { getUserLocation } from '../utils/geolocation';
+import '../styles/WeatherApp.css';
 
 const WeatherApp: React.FC = () => {
   const [location, setLocation] = useState<string>('');
@@ -44,30 +45,50 @@ const WeatherApp: React.FC = () => {
     }
   };
 
+  const getWeatherIcon = (description: string) => {
+    // Map weather descriptions to emoji icons
+    const iconMap: { [key: string]: string } = {
+      'clear sky': '☀️',
+      'few clouds': '🌤️',
+      'scattered clouds': '☁️',
+      'broken clouds': '☁️',
+      'shower rain': '🌧️',
+      'rain': '🌧️',
+      'thunderstorm': '⛈️',
+      'snow': '❄️',
+      'mist': '🌫️'
+    };
+    return iconMap[description.toLowerCase()] || '🌡️';
+  };
+
   return (
-    <div>
-      <h1>South African Weather App</h1>
+    <div className="weather-app">
+      <h1 className="app-title">South African Weather App</h1>
       
-      <form onSubmit={handleSearch}>
+      <form onSubmit={handleSearch} className="search-form">
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter location"
+          className="search-input"
         />
-        <button type="submit">Search</button>
+        <button type="submit" className="search-button">Search</button>
       </form>
 
-      {loading && <p>Loading weather data...</p>}
-      {error && <p>{error}</p>}
+      {loading && <p className="loading">Loading weather data...</p>}
+      {error && <p className="error">{error}</p>}
 
       {!loading && !error && (
-        <div>
+        <div className="weather-container">
+          <h2 className="location-title">{location}</h2>
           {weatherData.map((day, index) => (
-            <div key={index}>
-              <h2>{day.date}</h2>
-              <p>Temperature: {day.temp}°C</p>
-              <p>Description: {day.description}</p>
+            <div key={index} className="weather-card">
+              <h3 className="date">{day.date}</h3>
+              <p className="temperature">{day.temp}°C</p>
+              <p className="description">
+                {getWeatherIcon(day.description)} {day.description}
+              </p>
             </div>
           ))}
         </div>
